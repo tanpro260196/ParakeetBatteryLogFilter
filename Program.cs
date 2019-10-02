@@ -26,10 +26,12 @@ namespace ParakeetBatteryLogFilter
             int i = 0;
             for (i = 0; i < text.Count(); i++)
             {
+                //replace LOOP: # with loop start string
                 if ((text[i].Contains("LOOP: #")) && (!text[i].Contains("*")))
                 {
                     loop temploopdata = new loop();
                     int j = 0;
+                    //replace ***** with end loop string
                     for (j = i - 1; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
                     { 
                         temploopdata.looptext.Add(text[j]);
