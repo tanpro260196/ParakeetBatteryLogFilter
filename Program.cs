@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using Microsoft.VisualBasic;
-using System.Globalization;
 
 namespace ParakeetBatteryLogFilter
 {
@@ -135,7 +132,7 @@ namespace ParakeetBatteryLogFilter
             //CREATE AN ARRAY WITH ALL THE DATA YOU WANT TO EXPORT
             foreach (loop showdata in data)
             {
-                combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data));
+                combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data.ToArray()));
             }
             // Write the string array to a new file.
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename + ".csv")))
@@ -298,8 +295,8 @@ namespace ParakeetBatteryLogFilter
                 heaterstatus = "No result found";
             //This could get much more complicated. What if instead of 1 and 0 it's just a random number or word? 
             //What if there are multiple commands that return result like this in a script? 
-            //This should be take into consideration when you write you script. 
-            //Like add a pause long enough for the result to return right after the command, then use the command as identifier.
+            //This should be take into consideration when you write your script. 
+            //Ex: add a pause long enough for the result to return right after the command, then use the command as identifier.
         }
         public void CHG_STATUS42_Parse()
         {
