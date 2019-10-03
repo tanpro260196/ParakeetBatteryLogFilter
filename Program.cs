@@ -31,12 +31,12 @@ namespace ParakeetBatteryLogFilter
             for (i = 0; i < text.Count(); i++)
             {
                 //FIND LOOP START IDENTIFIER FIRST
-                //replace LOOP: # with loop start IDENTIFIER
+                //replace "LOOP: #" with loop start IDENTIFIER
                 if ((text[i].Contains("LOOP: #")) && (!text[i].Contains("*")))
                 {
                     loop temploopdata = new loop();
                     int j = 0;
-                    //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINE TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
+                    //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
                     for (j = i - 1; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
                     { 
@@ -149,9 +149,9 @@ namespace ParakeetBatteryLogFilter
     //THIS CLASS STORE AND PARSE DATA FROM EACH LOOP INTO NUMERIC DATA.
     public class loop
     {
-        //THIS VARIABLE CONTAIN RAW LOG DATA FOR THE LOOP
+        //THIS VARIABLE CONTAIN RAW LOG DATA OF THE LOOP
         public List<string> looptext;
-        //THESE VARIABLE STORE DATA AFTER YOU PARSED THEM.
+        //THESE VARIABLES STORE DATA AFTER YOU PARSED THEM.
         public string loopnumber;
         public string date_parsed;
         public List<string> VACDATA;
@@ -174,15 +174,19 @@ namespace ParakeetBatteryLogFilter
         public void LoopNumber_Parse()
         {
             //This search and extract loop number from the second string (index 1, using zero-based counting) in each loop.
-            //"LOOP #X".The X position in the string is 7 (count on zero-based position). 
-            //looptext[Y].Substring(Z): Y is the line number count from zero. Z is the position of X count from zero.
+            //The string we are looking for is in this format: "LOOP #X".The X position in the string is 7 (count on zero-based position). 
+            //Then we use this function to extract the data: looptext[Y].Substring(Z): Y is the line number count from zero. Z is the position of X count from zero.
             loopnumber = looptext[1].Substring(7);
         }
         public void DateTime_Parse()
         {
             //0 is the line number that contain date and time. Zero based.
+            //The date-time string looks like this: [MM DD YYYY, HH:MM:SSPM/AM]
+            //This line remove the bracket from the string.
             date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
+            //this line search for the seperator between date and time
             int datelocation = date_parsed.IndexOf(", ");
+            //this line remove the space between date and time.
             date_parsed = date_parsed.Remove(datelocation + 1, 1);
         }
         public void VACparse()
@@ -198,7 +202,7 @@ namespace ParakeetBatteryLogFilter
                 //First we search for AAA using this line: line.Contains("AAA")
                 if (line.Contains("m_stADC.stVac.u16VacADCVal"))
                 {
-                    //Then we search for location of xxx: int datalocation = line.IndexOf("xxx") + length_of_xxx);
+                    //Then we search for location of xxx: int datalocation = line.IndexOf("xxx") + length_of_xxx;
                     int datalocation = line.IndexOf("=> ") + 3;
                     //Finally we extract the data we want (aka YYY) and assign it to one of the variable we declared above.
                     VACDATA.Add(line.Substring(datalocation));
@@ -217,6 +221,10 @@ namespace ParakeetBatteryLogFilter
                     VACDATA.Add(line.Substring(datalocation));
                     resultfound++;
                 }
+                if (resultfound >= 3)
+                {
+                    break;
+                }
             }
             //if for some reason the result is not recorded in that loop. We add this instead.
             if (resultfound == 0)
@@ -224,13 +232,14 @@ namespace ParakeetBatteryLogFilter
         }
         public void batteryparse()
         {
-            //special case. The result is present in a table-like manner.
+            //Special case. The result is present in a table-like manner.
+            //This type usually have 1 line contain the data label and the data is in the next line.
             bool resultfound = false;
             battery_pegacmd = new List<string>();
             int i = 0;
             for (i=0; i< looptext.Count();i++)
             {
-                //search for the lable line.
+                //search for the lable line by literally search for the entire line.
                 if (looptext[i].Contains("VBUS(V) VBAT(V) VSYS(V) IBUS(mA) IBAT(mA) TS_JC(C) Discharging Percentage CHG_STAT"))
                 {
                     //the data we want will usually in the next line. Hence we use i+1.
@@ -269,6 +278,10 @@ namespace ParakeetBatteryLogFilter
                     int datalocation = line.IndexOf("=> ") + 3;
                     temperature.Add(line.Substring(datalocation));
                     resultfound++;
+                }
+                if (resultfound >= 2)
+                {
+                    break;
                 }
             }
             if (resultfound == 0)
@@ -309,6 +322,10 @@ namespace ParakeetBatteryLogFilter
                     CHG_STATUS42 = line.Substring(datalocation);
                     resultfound = true;
                 }
+                if (resultfound)
+                {
+                    break;
+                }
             }
             if (!resultfound)
                 CHG_STATUS42 = "No result found.";
@@ -324,6 +341,10 @@ namespace ParakeetBatteryLogFilter
                     JEITA43 = line.Substring(datalocation);
                     resultfound = true;
                 }
+                if (resultfound)
+                {
+                    break;
+                }
             }
             if (!resultfound)
                 JEITA43 = "No result found.";
@@ -338,6 +359,10 @@ namespace ParakeetBatteryLogFilter
                     int datalocation = line.IndexOf("= ") + 2;
                     Charging02 = line.Substring(datalocation);
                     resultfound = true;
+                }
+                if (resultfound)
+                {
+                    break;
                 }
             }
             if (!resultfound)
@@ -577,6 +602,8 @@ namespace ParakeetBatteryLogFilter
                     registerdump.Add(line.Substring(datalocation));
                     resultfound++;
                 }
+                if (resultfound >= 38)
+                    break;
             }
             if (resultfound == 0)
                 registerdump.Add("No result found.");
