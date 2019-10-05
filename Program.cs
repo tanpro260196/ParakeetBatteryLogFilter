@@ -3,22 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using Microsoft.VisualBasic;
+using Microsoft.Win32;
 
 namespace ParakeetBatteryLogFilter
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             //CALL FILE SELECTION FUNCTION
             FileInfo fileselection = get_filepath();
+            if (fileselection == null)
+                return;
             //READ AND PROCESSED LOG CONTENT
             List<loop> maintext_processed = readtext(fileselection.FullName);
+            if (maintext_processed ==  null)
+            {
+                Main();
+                return;
+            }
             //PARSE AND EXPORT TO CSV
             data_export(maintext_processed, fileselection.DirectoryName, fileselection.Name);
-            //HOLD WINDOWS OPEN
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey(true);
         }
         //THIS FUNCTION IDENTIFY THE BEGINNING AND END OF EACH LOOP IN THE LOG. 
         static List<loop> readtext(string file)
@@ -26,6 +32,14 @@ namespace ParakeetBatteryLogFilter
             //THE LOG IS SPIT AND SAVED EACH LOOP TO THIS VARIABLE BELOW
             List<loop> loopdata = new List<loop>();
             //READ THE CONTENT OF THE LOG FILE AND SAVE THEM TO A TEMP VARIABLE FOR PROCESSING.
+            try { System.IO.File.OpenRead(@file); }
+            catch (System.IO.IOException)
+            {
+                Console.WriteLine("Can't open file. Did you close Tera Term log yet?");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey(true);
+                return null;
+            }
             string[] text = System.IO.File.ReadAllLines(@file);
             int i = 0;
             for (i = 0; i < text.Count(); i++)
@@ -55,59 +69,32 @@ namespace ParakeetBatteryLogFilter
         static FileInfo get_filepath()
         {
             bool pathcheck = false;
-            bool fileselectcheck = false;
             string fileno = null;
-            FileInfo[] Files = null;
-            while (!pathcheck || !fileselectcheck)
+            FileInfo File = null;
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            while (!pathcheck)
             {
-                Console.WriteLine("Enter Log Folder Path:");
-                string filepath = Console.ReadLine();
-                DirectoryInfo d = new DirectoryInfo(@filepath);//Your Folder
-                if (!d.Exists)
-                {
-                    Console.WriteLine("That folder does not exist. Press any key to continue...");
-                    Console.ReadKey(true);
-                    continue;
-                }
-                Files = d.GetFiles("*.log"); //Getting Log files
-                if (!(Files.Count() == 0))
+                openFileDialog1.Multiselect = false;
+                openFileDialog1.InitialDirectory = @"C:\BatteryTest";
+                openFileDialog1.DefaultExt = "log";
+                openFileDialog1.Title = "Open Log File";
+                openFileDialog1.CheckFileExists = true;
+                openFileDialog1.CheckPathExists = true;
+                openFileDialog1.Filter = "Log Files(*.log)| *.log";
+                openFileDialog1.ShowDialog();
+                //Console.WriteLine(openFileDialog1.FileName);
+                if (openFileDialog1.FileName.Length == 0)
+                    return null;
+                if ((openFileDialog1.FileName.Substring(openFileDialog1.FileName.Length - 3)) == "log")
                 {
                     pathcheck = true;
                 }
                 else
-                {
-                    Console.WriteLine("No log found. Press any key to continue...");
-                    Console.ReadKey(true);
-                    continue;
-                }
-                int filecount = 0;
-                foreach (FileInfo file in Files)
-                {
-                    filecount++;
-                    Console.WriteLine("[" + filecount + "] " + file.Name);
-                }
-
-                Console.WriteLine("Select log file number to open:");
-                fileno = Console.ReadLine();
-                if ((int.TryParse(fileno, out int _)) && fileno != "0")
-                {
-                    fileselectcheck = true;
-                }
-                else
-                {
-                    Console.WriteLine("Incorrect input. Press any key to continue...");
-                    Console.ReadKey(true);
-                    continue;
-                }
-                if (Convert.ToInt32(fileno) > Files.Count())
-                {
-                    Console.WriteLine("Incorrect input. Press any key to continue...");
-                    Console.ReadKey(true);
-                    continue;
-                }
+                    return null;
             }
-            //string completefile = Files[Convert.ToInt32(fileno) - 1].FullName;
-            return Files[Convert.ToInt32(fileno) - 1];
+            File = new FileInfo(openFileDialog1.FileName);
+
+            return File;
         }
         //THIS FUNCTION HANDLE DATA EXPORT.
         static void data_export(List<loop> data, string folderpath, string filename)
@@ -125,6 +112,7 @@ namespace ParakeetBatteryLogFilter
                 showdata.JEITA43_Parse();
                 showdata.Charging02_Parse();
                 showdata.registerdump_parse();
+                showdata.FW_Version_Parse();
                 //COMBINE ALL PARSED DATA INTO A SINGLE STRING. THIS SHOULD ALWAYS BE THE LAST STEP.
                 showdata.combinedata();
             }
@@ -135,15 +123,15 @@ namespace ParakeetBatteryLogFilter
                 combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data.ToArray()));
             }
             // Write the string array to a new file.
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename + ".csv")))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv")))
             {
                 //THIS LINE IS THE LABEL OF EACH COLUMNS IN THE CSV FILE. CHANGE OR REMOVE THEM AS YOU SEE FIT.
-                outputFile.WriteLine("Loop #, Date, Time, u16VacADCVal, u16VacADCFirstVal, sVacVoltage,VBUS(V), VBAT(V), VSYS(V), IBUS(mA), IBAT(mA), TS_JC(C), Discharging, Percentage, CHG_STAT,wSysTempADCValue,wSysTemperature,Heater Status,CHG_STATUS,JEITA,Charging Status (0x02),Reg(0x00),Reg(0x01),Reg(0x02),Reg(0x03),Reg(0x04),Reg(0x05),Reg(0x06),Reg(0x07),Reg(0x08),Reg(0x09),Reg(0x0a),Reg(0x0b),Reg(0x0c),Reg(0x0d),Reg(0x0e),Reg(0x0f),Reg(0x10),Reg(0x11),Reg(0x18),Reg(0x19),Reg(0x1a),Reg(0x40),Reg(0x42),Reg(0x43),Reg(0x44),Reg(0x45),Reg(0x50),Reg(0x51),Reg(0x52),Reg(0x53),Reg(0x54),Reg(0x55),Reg(0x60),Reg(0x61),Reg(0x62),Reg(0x63),Reg(0x64),Reg(0x65)");
+                outputFile.WriteLine("Loop #, Date, Time, u16VacADCVal, u16VacADCFirstVal, sVacVoltage,VBUS(V), VBAT(V), VSYS(V), IBUS(mA), IBAT(mA), TS_JC(C), Discharging, Percentage, CHG_STAT,wSysTempADCValue,wSysTemperature,Heater Status,CHG_STATUS,JEITA,Charging Status (0x02),Reg(0x00),Reg(0x01),Reg(0x02),Reg(0x03),Reg(0x04),Reg(0x05),Reg(0x06),Reg(0x07),Reg(0x08),Reg(0x09),Reg(0x0a),Reg(0x0b),Reg(0x0c),Reg(0x0d),Reg(0x0e),Reg(0x0f),Reg(0x10),Reg(0x11),Reg(0x18),Reg(0x19),Reg(0x1a),Reg(0x40),Reg(0x42),Reg(0x43),Reg(0x44),Reg(0x45),Reg(0x50),Reg(0x51),Reg(0x52),Reg(0x53),Reg(0x54),Reg(0x55),Reg(0x60),Reg(0x61),Reg(0x62),Reg(0x63),Reg(0x64),Reg(0x65),FW Version,Wifi Version,Camera Version");
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
-            Console.WriteLine("Data Exported to " + folderpath + ". Saved as the same name as the input.");
-
+            Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to exit...");
+            Console.ReadKey(true);
         }
     }
     //THIS CLASS STORE AND PARSE DATA FROM EACH LOOP INTO NUMERIC DATA.
@@ -162,6 +150,7 @@ namespace ParakeetBatteryLogFilter
         public string JEITA43;
         public string Charging02;
         public List<string> registerdump;
+        public List<string> FWVersion;
         //THIS VARIABLE COMBINE ALL THE ABOVE INTO ONE.
         public List<string> all_processed_parsed_data;
         
@@ -608,6 +597,38 @@ namespace ParakeetBatteryLogFilter
             if (resultfound == 0)
                 registerdump.Add("No result found.");
         }
+        public void FW_Version_Parse()
+        {
+            FWVersion = new List<string>();
+            int resultfound = 0;
+            foreach (string line in looptext)
+            {
+                if (line.Contains("	version = "))
+                {
+                    int datalocation = line.IndexOf("= ") + 2;
+                    FWVersion.Add(line.Substring(datalocation));
+                    resultfound++;
+                }
+                if (line.Contains("wifi version = "))
+                {
+                    int datalocation = line.IndexOf("= ") + 2;
+                    FWVersion.Add(line.Substring(datalocation));
+                    resultfound++;
+                }
+                if (line.Contains("camif --version:"))
+                {
+                    int datalocation = line.IndexOf(":") + 1;
+                    FWVersion.Add(line.Substring(datalocation));
+                    resultfound++;
+                }
+                if (resultfound >= 3)
+                {
+                    break;
+                }
+            }
+            if (resultfound == 0)
+                FWVersion.Add("No result found.,,");
+        }
         public void combinedata()
         {
             //here you combine add variables you declared in the first part of this class into one long string.
@@ -623,6 +644,7 @@ namespace ParakeetBatteryLogFilter
             all_processed_parsed_data.Add(JEITA43);
             all_processed_parsed_data.Add(Charging02);
             all_processed_parsed_data.AddRange(registerdump);
+            all_processed_parsed_data.AddRange(FWVersion);
         }
         //This function remove all white spaces that are like this "     " and replace that with " "
         private static string NormalizeWhiteSpace(string input, char normalizeTo = ' ')
