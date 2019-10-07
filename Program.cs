@@ -4,40 +4,43 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Microsoft.VisualBasic;
-using Microsoft.Win32;
+//using Microsoft.Win32;
 using System.Windows.Forms;
 
 namespace ParakeetBatteryLogFilter
 {
     class Program
     {
+        [STAThread]
         static void Main()
         {
 
             //CALL FILE SELECTION FUNCTION
-            List<FileInfo> fileselection = get_filepath();
+            List<FileInfo> fileselection = Get_filepath();
             if (fileselection == null)
                 return;
             //READ AND PROCESSED LOG CONTENT
             foreach (FileInfo file in fileselection)
             {
-                List<loop> maintext_processed = readtext(file.FullName);
+                List<Loop> maintext_processed = Readtext(file.FullName);
                 if (maintext_processed == null)
                 {
                     Main();
                     return;
                 }
                 //PARSE AND EXPORT TO CSV
-                data_export(maintext_processed, file.DirectoryName, file.Name);
+                Data_export(maintext_processed, file.DirectoryName, file.Name);
             }
         }
         //THIS FUNCTION IDENTIFY THE BEGINNING AND END OF EACH LOOP IN THE LOG. 
-        static List<loop> readtext(string file)
+        static List<Loop> Readtext(string file)
         {
             //THE LOG IS SPIT AND SAVED EACH LOOP TO THIS VARIABLE BELOW
-            List<loop> loopdata = new List<loop>();
+            List<Loop> loopdata = new List<Loop>();
             //READ THE CONTENT OF THE LOG FILE AND SAVE THEM TO A TEMP VARIABLE FOR PROCESSING.
-            try { System.IO.File.OpenRead(@file); }
+            try { FileStream checkread = System.IO.File.OpenRead(@file);
+                checkread.Close();
+            }
             catch (System.IO.IOException)
             {
                 string message_failed = "Cannot open destination file. File is in use.";
@@ -63,7 +66,7 @@ namespace ParakeetBatteryLogFilter
                 //replace "LOOP: #" with loop start IDENTIFIER
                 if ((text[i].Contains("LOOP: #")) && (!text[i].Contains("*")))
                 {
-                    loop temploopdata = new loop();
+                    Loop temploopdata = new Loop();
                     int j = 0;
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
@@ -81,10 +84,10 @@ namespace ParakeetBatteryLogFilter
             return loopdata;
         }
         //THIS FUNCTION HANDLE USER INPUT. IGNORE THIS.
-        static List<FileInfo> get_filepath()
+        static List<FileInfo> Get_filepath()
         {
             bool pathcheck = false;
-            Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
             List<FileInfo> File = new List<FileInfo>();
             while (!pathcheck)
             {
@@ -95,9 +98,9 @@ namespace ParakeetBatteryLogFilter
                 openFileDialog1.CheckFileExists = true;
                 openFileDialog1.CheckPathExists = true;
                 openFileDialog1.Filter = "Log Files(*.log)| *.log";
-                openFileDialog1.ShowDialog();
+                DialogResult result = openFileDialog1.ShowDialog();
                 //Console.WriteLine(openFileDialog1.FileName);
-                if (openFileDialog1.FileNames.Count() == 0)
+                if (result == DialogResult.Cancel)
                     break;
                 foreach (string filename in openFileDialog1.FileNames)
                 {
@@ -111,32 +114,32 @@ namespace ParakeetBatteryLogFilter
                     
                 }
             }
-
+            openFileDialog1.Dispose();
             return File;
         }
         //THIS FUNCTION HANDLE DATA EXPORT.
-        static void data_export(List<loop> data, string folderpath, string filename)
+        static void Data_export(List<Loop> data, string folderpath, string filename)
         {
             //CALL PARSE FUNCTION AND EXTRACT WANTED DATA. SEE THE CLASS FUNCTION FOR DETAILS.
-            foreach (loop showdata in data)
+            foreach (Loop showdata in data)
             {
                 showdata.LoopNumber_Parse();
                 showdata.DateTime_Parse();
                 showdata.VACparse();
-                showdata.batteryparse();
+                showdata.Batteryparse();
                 showdata.TemperatureParse();
                 showdata.HeaterParse();
                 showdata.CHG_STATUS42_Parse();
                 showdata.JEITA43_Parse();
                 showdata.Charging02_Parse();
-                showdata.registerdump_parse();
+                showdata.Registerdump_parse();
                 showdata.FW_Version_Parse();
                 //COMBINE ALL PARSED DATA INTO A SINGLE STRING. THIS SHOULD ALWAYS BE THE LAST STEP.
-                showdata.combinedata();
+                showdata.Combinedata();
             }
             List<string> combinetocsv = new List<string>();
             //CREATE AN ARRAY WITH ALL THE DATA YOU WANT TO EXPORT
-            foreach (loop showdata in data)
+            foreach (Loop showdata in data)
             {
                 combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data.ToArray()));
             }
@@ -183,7 +186,7 @@ namespace ParakeetBatteryLogFilter
         }
     }
     //THIS CLASS STORE AND PARSE DATA FROM EACH LOOP INTO NUMERIC DATA.
-    public class loop
+    public class Loop
     {
         //THIS VARIABLE CONTAIN RAW LOG DATA OF THE LOOP
         public List<string> looptext;
@@ -203,7 +206,7 @@ namespace ParakeetBatteryLogFilter
         public List<string> all_processed_parsed_data;
         
         //THIS FUNCTION INITIALIZE THE CLASS. IGNORE THIS.
-        public loop()
+        public Loop()
         {
             looptext = new List<string>();
         }
@@ -267,14 +270,14 @@ namespace ParakeetBatteryLogFilter
             if (resultfound == 0)
                 VACDATA.Add("No result found., ,");
         }
-        public void batteryparse()
+        public void Batteryparse()
         {
             //Special case. The result is present in a table-like manner.
             //This type usually have 1 line contain the data label and the data is in the next line.
             bool resultfound = false;
             battery_pegacmd = new List<string>();
-            int i = 0;
-            for (i=0; i< looptext.Count();i++)
+            //int i = 0;
+            for (int i=0; i< looptext.Count();i++)
             {
                 //search for the lable line by literally search for the entire line.
                 if (looptext[i].Contains("VBUS(V) VBAT(V) VSYS(V) IBUS(mA) IBAT(mA) TS_JC(C) Discharging Percentage CHG_STAT"))
@@ -405,7 +408,7 @@ namespace ParakeetBatteryLogFilter
             if (!resultfound)
                 Charging02 = "No result found.";
         }
-        public void registerdump_parse()
+        public void Registerdump_parse()
         {
             registerdump = new List<string>();
             int resultfound = 0;
@@ -677,7 +680,7 @@ namespace ParakeetBatteryLogFilter
             if (resultfound == 0)
                 FWVersion.Add("No result found.,,");
         }
-        public void combinedata()
+        public void Combinedata()
         {
             //here you combine add variables you declared in the first part of this class into one long string.
             //If the variable is of List<> type, use AddRange(), if not, use Add().
