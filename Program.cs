@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
+using System.Windows.Forms;
 
 namespace ParakeetBatteryLogFilter
 {
@@ -12,6 +13,7 @@ namespace ParakeetBatteryLogFilter
     {
         static void Main()
         {
+
             //CALL FILE SELECTION FUNCTION
             List<FileInfo> fileselection = get_filepath();
             if (fileselection == null)
@@ -38,10 +40,20 @@ namespace ParakeetBatteryLogFilter
             try { System.IO.File.OpenRead(@file); }
             catch (System.IO.IOException)
             {
-                Console.WriteLine("Can't open file. Did you close Tera Term log yet?");
-                Console.WriteLine("Press any key to continue...");
-                Console.ReadKey(true);
-                return null;
+                string message_failed = "Cannot open destination file. File is in use.";
+                string caption_failed = "IO Error";
+                MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
+                DialogResult result_fail;
+                // Displays the MessageBox.
+                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
+                if (result_fail == System.Windows.Forms.DialogResult.OK)
+                {
+                    return null;
+                }
+                //Console.WriteLine("Can't open file. Did you close Tera Term log yet?");
+                //Console.WriteLine("Press any key to continue...");
+                //Console.ReadKey(true);
+                //return null;
             }
             string[] text = System.IO.File.ReadAllLines(@file);
             int i = 0;
@@ -72,7 +84,7 @@ namespace ParakeetBatteryLogFilter
         static List<FileInfo> get_filepath()
         {
             bool pathcheck = false;
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
             List<FileInfo> File = new List<FileInfo>();
             while (!pathcheck)
             {
@@ -129,6 +141,24 @@ namespace ParakeetBatteryLogFilter
                 combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data.ToArray()));
             }
             // Write the string array to a new file.
+            try            
+            {
+                FileStream checkwrite = System.IO.File.OpenWrite(@Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv"));
+                checkwrite.Close();
+            }
+            catch(System.IO.IOException)
+            {
+                string message_failed = "Cannot write to destination file. File is in use.";
+                string caption_failed = "IO Error";
+                MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
+                DialogResult result_fail;
+                // Displays the MessageBox.
+                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
+                if (result_fail == System.Windows.Forms.DialogResult.OK)
+                {
+                    return;
+                }
+            }
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv")))
             {
                 //THIS LINE IS THE LABEL OF EACH COLUMNS IN THE CSV FILE. CHANGE OR REMOVE THEM AS YOU SEE FIT.
@@ -136,8 +166,19 @@ namespace ParakeetBatteryLogFilter
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
-            Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to continue...");
-            Console.ReadKey(true);
+            string message = "Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv.";
+            string caption = "Success!";
+            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            DialogResult result;
+
+            // Displays the MessageBox.
+            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information);
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                return;
+            }
+            //Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to continue...");
+            //Console.ReadKey(true);
         }
     }
     //THIS CLASS STORE AND PARSE DATA FROM EACH LOOP INTO NUMERIC DATA.
