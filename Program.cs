@@ -13,18 +13,21 @@ namespace ParakeetBatteryLogFilter
         static void Main()
         {
             //CALL FILE SELECTION FUNCTION
-            FileInfo fileselection = get_filepath();
+            List<FileInfo> fileselection = get_filepath();
             if (fileselection == null)
                 return;
             //READ AND PROCESSED LOG CONTENT
-            List<loop> maintext_processed = readtext(fileselection.FullName);
-            if (maintext_processed ==  null)
+            foreach (FileInfo file in fileselection)
             {
-                Main();
-                return;
+                List<loop> maintext_processed = readtext(file.FullName);
+                if (maintext_processed == null)
+                {
+                    Main();
+                    return;
+                }
+                //PARSE AND EXPORT TO CSV
+                data_export(maintext_processed, file.DirectoryName, file.Name);
             }
-            //PARSE AND EXPORT TO CSV
-            data_export(maintext_processed, fileselection.DirectoryName, fileselection.Name);
         }
         //THIS FUNCTION IDENTIFY THE BEGINNING AND END OF EACH LOOP IN THE LOG. 
         static List<loop> readtext(string file)
@@ -66,15 +69,14 @@ namespace ParakeetBatteryLogFilter
             return loopdata;
         }
         //THIS FUNCTION HANDLE USER INPUT. IGNORE THIS.
-        static FileInfo get_filepath()
+        static List<FileInfo> get_filepath()
         {
             bool pathcheck = false;
-            string fileno = null;
-            FileInfo File = null;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            List<FileInfo> File = new List<FileInfo>();
             while (!pathcheck)
             {
-                openFileDialog1.Multiselect = false;
+                openFileDialog1.Multiselect = true;
                 openFileDialog1.InitialDirectory = @"C:\BatteryTest";
                 openFileDialog1.DefaultExt = "log";
                 openFileDialog1.Title = "Open Log File";
@@ -83,16 +85,20 @@ namespace ParakeetBatteryLogFilter
                 openFileDialog1.Filter = "Log Files(*.log)| *.log";
                 openFileDialog1.ShowDialog();
                 //Console.WriteLine(openFileDialog1.FileName);
-                if (openFileDialog1.FileName.Length == 0)
-                    return null;
-                if ((openFileDialog1.FileName.Substring(openFileDialog1.FileName.Length - 3)) == "log")
+                if (openFileDialog1.FileNames.Count() == 0)
+                    break;
+                foreach (string filename in openFileDialog1.FileNames)
                 {
-                    pathcheck = true;
+                    if (filename.Length == 0)
+                        break;
+                    if ((filename.Substring(filename.Length - 3)) == "log")
+                    {
+                        pathcheck = true;
+                        File.Add(new FileInfo(filename));
+                    }
+                    
                 }
-                else
-                    return null;
             }
-            File = new FileInfo(openFileDialog1.FileName);
 
             return File;
         }
@@ -130,7 +136,7 @@ namespace ParakeetBatteryLogFilter
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
-            Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to exit...");
+            Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to continue...");
             Console.ReadKey(true);
         }
     }
