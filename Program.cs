@@ -156,6 +156,7 @@ namespace ParakeetBatteryLogFilter
                 result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
                 if (result_fail == System.Windows.Forms.DialogResult.OK)
                 {
+                    Main();
                     return;
                 }
             }
@@ -166,7 +167,7 @@ namespace ParakeetBatteryLogFilter
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
-            string message = "Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv.";
+            string message = "Data exported to " + folderpath +"\\" + filename.Remove(filename.Length - 4) + ".csv.";
             string caption = "Success!";
             MessageBoxButtons buttons = MessageBoxButtons.OK;
             DialogResult result;
