@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Microsoft.VisualBasic;
-//using Microsoft.Win32;
+using Microsoft.Win32;
 using System.Windows.Forms;
 
 namespace ParakeetBatteryLogFilter
@@ -48,7 +48,7 @@ namespace ParakeetBatteryLogFilter
                 MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
                 DialogResult result_fail;
                 // Displays the MessageBox.
-                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
+                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result_fail == System.Windows.Forms.DialogResult.OK)
                 {
                     return null;
@@ -87,7 +87,7 @@ namespace ParakeetBatteryLogFilter
         static List<FileInfo> Get_filepath()
         {
             bool pathcheck = false;
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
             List<FileInfo> File = new List<FileInfo>();
             while (!pathcheck)
             {
@@ -98,9 +98,9 @@ namespace ParakeetBatteryLogFilter
                 openFileDialog1.CheckFileExists = true;
                 openFileDialog1.CheckPathExists = true;
                 openFileDialog1.Filter = "Log Files(*.log)| *.log";
-                DialogResult result = openFileDialog1.ShowDialog();
+                bool? result = openFileDialog1.ShowDialog();
                 //Console.WriteLine(openFileDialog1.FileName);
-                if (result == DialogResult.Cancel)
+                if (result == false)
                     break;
                 foreach (string filename in openFileDialog1.FileNames)
                 {
@@ -114,7 +114,7 @@ namespace ParakeetBatteryLogFilter
                     
                 }
             }
-            openFileDialog1.Dispose();
+            //openFileDialog1.Dispose();
             return File;
         }
         //THIS FUNCTION HANDLE DATA EXPORT.
@@ -156,7 +156,7 @@ namespace ParakeetBatteryLogFilter
                 MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
                 DialogResult result_fail;
                 // Displays the MessageBox.
-                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
+                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result_fail == System.Windows.Forms.DialogResult.OK)
                 {
                     Main();
@@ -176,7 +176,7 @@ namespace ParakeetBatteryLogFilter
             DialogResult result;
 
             // Displays the MessageBox.
-            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information);
+            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
             if (result == System.Windows.Forms.DialogResult.OK)
             {
                 return;
