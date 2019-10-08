@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using Microsoft.VisualBasic;
-//using Microsoft.Win32;
+using Microsoft.Win32;
 using System.Windows.Forms;
 
 namespace ParakeetBatteryLogFilter
 {
     class Program
     {
-        [STAThread]
+        //[STAThread]
         static void Main()
         {
 
@@ -87,20 +87,21 @@ namespace ParakeetBatteryLogFilter
         static List<FileInfo> Get_filepath()
         {
             bool pathcheck = false;
-            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
+            openFileDialog1.Multiselect = true;
+            openFileDialog1.InitialDirectory = @"C:\BatteryTest";
+            openFileDialog1.DefaultExt = "log";
+            openFileDialog1.Title = "Open Log File";
+            openFileDialog1.CheckFileExists = true;
+            openFileDialog1.CheckPathExists = true;
+            openFileDialog1.Filter = "Log Files(*.log)| *.log";
             List<FileInfo> File = new List<FileInfo>();
+            
             while (!pathcheck)
             {
-                openFileDialog1.Multiselect = true;
-                openFileDialog1.InitialDirectory = @"C:\BatteryTest";
-                openFileDialog1.DefaultExt = "log";
-                openFileDialog1.Title = "Open Log File";
-                openFileDialog1.CheckFileExists = true;
-                openFileDialog1.CheckPathExists = true;
-                openFileDialog1.Filter = "Log Files(*.log)| *.log";
-                DialogResult result = openFileDialog1.ShowDialog();
+                bool? result = openFileDialog1.ShowDialog();
                 //Console.WriteLine(openFileDialog1.FileName);
-                if (result == DialogResult.Cancel)
+                if (result == false)
                     break;
                 foreach (string filename in openFileDialog1.FileNames)
                 {
@@ -114,7 +115,7 @@ namespace ParakeetBatteryLogFilter
                     
                 }
             }
-            openFileDialog1.Dispose();
+            //openFileDialog1.Dispose();
             return File;
         }
         //THIS FUNCTION HANDLE DATA EXPORT.
