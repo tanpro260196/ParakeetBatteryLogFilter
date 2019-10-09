@@ -87,10 +87,11 @@ namespace ParakeetBatteryLogFilter
         static List<FileInfo> Get_filepath()
         {
             bool pathcheck = false;
-            Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             List<FileInfo> File = new List<FileInfo>();
             while (!pathcheck)
             {
+                
                 openFileDialog1.Multiselect = true;
                 openFileDialog1.InitialDirectory = @"C:\BatteryTest";
                 openFileDialog1.DefaultExt = "log";
@@ -98,9 +99,9 @@ namespace ParakeetBatteryLogFilter
                 openFileDialog1.CheckFileExists = true;
                 openFileDialog1.CheckPathExists = true;
                 openFileDialog1.Filter = "Log Files(*.log)| *.log";
-                bool? result = openFileDialog1.ShowDialog();
+                DialogResult result = openFileDialog1.ShowDialog();
                 //Console.WriteLine(openFileDialog1.FileName);
-                if (result == false)
+                if (result == DialogResult.Cancel)
                     break;
                 foreach (string filename in openFileDialog1.FileNames)
                 {
@@ -173,8 +174,7 @@ namespace ParakeetBatteryLogFilter
             string message = "Data exported to " + folderpath +"\\" + filename.Remove(filename.Length - 4) + ".csv.";
             string caption = "Success!";
             MessageBoxButtons buttons = MessageBoxButtons.OK;
-            DialogResult result;
-
+            DialogResult result;        
             // Displays the MessageBox.
             result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
             if (result == System.Windows.Forms.DialogResult.OK)
