@@ -36,7 +36,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>ParakeetBatteryLogFilter.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>telogo_Arlo_logo_stacked_full_colour.ico</ApplicationIcon>
