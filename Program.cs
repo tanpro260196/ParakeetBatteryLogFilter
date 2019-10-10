@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace ParakeetBatteryLogFilter
 {
@@ -14,9 +15,8 @@ namespace ParakeetBatteryLogFilter
         [STAThread]
         static void Main()
         {
-
             //CALL FILE SELECTION FUNCTION
-            List<FileInfo> fileselection = Get_filepath();
+            List <FileInfo> fileselection = Get_filepath();
             if (fileselection == null)
                 return;
             //READ AND PROCESSED LOG CONTENT
@@ -70,7 +70,11 @@ namespace ParakeetBatteryLogFilter
                     int j = 0;
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
-                    for (j = i - 1; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
+                    int offset;
+                    if (text[i - 1].Length == 0)
+                        offset = 2;
+                    else offset = 1;
+                    for (j = i - offset; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
                     { 
                         temploopdata.looptext.Add(text[j]);
                     }
@@ -170,18 +174,23 @@ namespace ParakeetBatteryLogFilter
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
-            string message = "Data exported to " + folderpath +"\\" + filename.Remove(filename.Length - 4) + ".csv.";
+            string message = "Data exported to " + folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + Environment.NewLine + "Open exported file?";
             string caption = "Success!";
-            MessageBoxButtons buttons = MessageBoxButtons.OK;
-            DialogResult result;        
+            MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+            DialogResult result;
+            //test
+            //Form1 newform = new Form1(caption,message, folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
+            //Application.Run(newform);
+            //test
             // Displays the MessageBox.
-            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-            if (result == System.Windows.Forms.DialogResult.OK)
+            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+            if (result == System.Windows.Forms.DialogResult.Yes)
             {
+                System.Diagnostics.Process.Start(folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
                 return;
             }
-            //Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to continue...");
-            //Console.ReadKey(true);
+            else
+                return;
         }
     }
     //THIS CLASS STORE AND PARSE DATA FROM EACH LOOP INTO NUMERIC DATA.
@@ -215,18 +224,30 @@ namespace ParakeetBatteryLogFilter
             //This search and extract loop number from the second string (index 1, using zero-based counting) in each loop.
             //The string we are looking for is in this format: "LOOP #X".The X position in the string is 7 (count on zero-based position). 
             //Then we use this function to extract the data: looptext[Y].Substring(Z): Y is the line number count from zero. Z is the position of X count from zero.
-            loopnumber = looptext[1].Substring(7);
+            foreach (string line in looptext)
+            {
+                if (line.Contains("LOOP: #"))
+                {
+                    loopnumber =line.Substring(7);
+                    break;
+                }
+            }
         }
         public void DateTime_Parse()
         {
             //0 is the line number that contain date and time. Zero based.
             //The date-time string looks like this: [MM DD YYYY, HH:MM:SSPM/AM]
             //This line remove the bracket from the string.
-            date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
-            //this line search for the seperator between date and time
-            int datelocation = date_parsed.IndexOf(", ");
-            //this line remove the space between date and time.
-            date_parsed = date_parsed.Remove(datelocation + 1, 1);
+            if (looptext[0].Length > 3)
+            {
+                date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
+                //this line search for the seperator between date and time
+                int datelocation = date_parsed.IndexOf(", ");
+                //this line remove the space between date and time.
+                date_parsed = date_parsed.Remove(datelocation + 1, 1);
+            }
+            else
+                date_parsed = "Error,Error";
         }
         public void VACparse()
         {
