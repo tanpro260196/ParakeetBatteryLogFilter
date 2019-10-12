@@ -182,6 +182,7 @@ namespace ParakeetBatteryLogFilter
             //Form1 newform = new Form1(caption,message, folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
             //Application.Run(newform);
             //test
+
             // Displays the MessageBox.
             result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
             if (result == System.Windows.Forms.DialogResult.Yes)
@@ -241,6 +242,8 @@ namespace ParakeetBatteryLogFilter
             if (looptext[0].Length > 3)
             {
                 date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
+                if (!(looptext[0].Remove(looptext[0].Length - 3)).Substring(1).Contains(','))
+                    date_parsed = date_parsed + ", ";
                 //this line search for the seperator between date and time
                 int datelocation = date_parsed.IndexOf(", ");
                 //this line remove the space between date and time.
@@ -304,6 +307,9 @@ namespace ParakeetBatteryLogFilter
                 {
                     //the data we want will usually in the next line. Hence we use i+1.
                     string batterydata = looptext[i + 1];
+                    //replace junk data with space.
+                    batterydata = batterydata.Replace('/', ' ');
+                    batterydata = batterydata.Replace('#', ' ');
                     //Then we remove all white space and replace with a single space using NormalizeWhiteSpace funtion.
                     batterydata = NormalizeWhiteSpace(batterydata);
                     //spit the normalized string into an array of number.
