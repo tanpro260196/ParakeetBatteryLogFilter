@@ -19,9 +19,10 @@ namespace ParakeetBatteryLogFilter
             List <FileInfo> fileselection = Get_filepath();
             if (fileselection == null)
                 return;
-            //READ AND PROCESSED LOG CONTENT
+            //Loop through all selected files.
             foreach (FileInfo file in fileselection)
             {
+                //READ AND PROCESSED LOG CONTENT
                 List<Loop> maintext_processed = Readtext(file.FullName);
                 if (maintext_processed == null)
                 {
@@ -43,7 +44,7 @@ namespace ParakeetBatteryLogFilter
             }
             catch (System.IO.IOException)
             {
-                string message_failed = "Cannot open destination file. File is in use.";
+                string message_failed = "Cannot open input file(s). File(s) is in use.";
                 string caption_failed = "IO Error";
                 MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
                 DialogResult result_fail;
@@ -250,7 +251,7 @@ namespace ParakeetBatteryLogFilter
                 date_parsed = date_parsed.Remove(datelocation + 1, 1);
             }
             else
-                date_parsed = "Error,Error";
+                date_parsed = "Parse Error,Parse Error";
         }
         public void VACparse()
         {
@@ -265,7 +266,7 @@ namespace ParakeetBatteryLogFilter
                 //First we search for AAA using this line: line.Contains("AAA")
                 if (line.Contains("m_stADC.stVac.u16VacADCVal"))
                 {
-                    //Then we search for location of xxx: int datalocation = line.IndexOf("xxx") + length_of_xxx;
+                    //Then we search for location of xxx: "int datalocation = line.IndexOf("xxx") + length_of_xxx";
                     int datalocation = line.IndexOf("=> ") + 3;
                     //Finally we extract the data we want (aka YYY) and assign it to one of the variable we declared above.
                     VACDATA.Add(line.Substring(datalocation));
