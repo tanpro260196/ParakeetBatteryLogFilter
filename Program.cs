@@ -69,12 +69,13 @@ namespace ParakeetBatteryLogFilter
                 {
                     Loop temploopdata = new Loop();
                     int j = 0;
-                    //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
-                    //replace ***** with end loop IDENTIFIER
                     int offset;
+                    //Checking if the loop number and date is in proper position.
                     if (text[i - 1].Length == 0)
                         offset = 2;
                     else offset = 1;
+                    //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
+                    //replace ***** with end loop IDENTIFIER
                     for (j = i - offset; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
                     { 
                         temploopdata.looptext.Add(text[j]);
@@ -156,17 +157,19 @@ namespace ParakeetBatteryLogFilter
             }
             catch(System.IO.IOException)
             {
-                string message_failed = "Cannot write to destination file. File is in use.";
+                string message_failed = "Cannot write to destination file. File is in use." + Environment.NewLine + "Try again?";
                 string caption_failed = "IO Error";
-                MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
+                MessageBoxButtons buttons_fail = MessageBoxButtons.YesNo;
                 DialogResult result_fail;
                 // Displays the MessageBox.
                 result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                if (result_fail == System.Windows.Forms.DialogResult.OK)
+                if (result_fail == System.Windows.Forms.DialogResult.Yes)
                 {
-                    Main();
+                    Data_export(data, folderpath, filename);
                     return;
                 }
+                else
+                    return;
             }
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv")))
             {
