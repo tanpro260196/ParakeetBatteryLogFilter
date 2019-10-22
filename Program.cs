@@ -6,6 +6,7 @@ using System.IO;
 using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace ParakeetBatteryLogFilter
 {
@@ -14,14 +15,14 @@ namespace ParakeetBatteryLogFilter
         //[STAThread]
         static void Main()
         {
-
             //CALL FILE SELECTION FUNCTION
-            List<FileInfo> fileselection = Get_filepath();
+            List <FileInfo> fileselection = Get_filepath();
             if (fileselection == null)
                 return;
-            //READ AND PROCESSED LOG CONTENT
+            //Loop through all selected files.
             foreach (FileInfo file in fileselection)
             {
+                //READ AND PROCESSED LOG CONTENT
                 List<Loop> maintext_processed = Readtext(file.FullName);
                 if (maintext_processed == null)
                 {
@@ -43,12 +44,12 @@ namespace ParakeetBatteryLogFilter
             }
             catch (System.IO.IOException)
             {
-                string message_failed = "Cannot open destination file. File is in use.";
+                string message_failed = "Cannot open input file(s). File(s) is in use.";
                 string caption_failed = "IO Error";
                 MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
                 DialogResult result_fail;
                 // Displays the MessageBox.
-                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
+                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 if (result_fail == System.Windows.Forms.DialogResult.OK)
                 {
                     return null;
@@ -68,9 +69,14 @@ namespace ParakeetBatteryLogFilter
                 {
                     Loop temploopdata = new Loop();
                     int j = 0;
+                    int offset;
+                    //Checking if the loop number and date is in proper position.
+                    if (text[i - 1].Length == 0)
+                        offset = 2;
+                    else offset = 1;
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
-                    for (j = i - 1; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
+                    for (j = i - offset; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
                     { 
                         temploopdata.looptext.Add(text[j]);
                     }
@@ -87,7 +93,7 @@ namespace ParakeetBatteryLogFilter
         static List<FileInfo> Get_filepath()
         {
             bool pathcheck = false;
-            Microsoft.Win32.OpenFileDialog openFileDialog1 = new Microsoft.Win32.OpenFileDialog();
+            System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             openFileDialog1.Multiselect = true;
             openFileDialog1.InitialDirectory = @"C:\BatteryTest";
             openFileDialog1.DefaultExt = "log";
@@ -115,7 +121,7 @@ namespace ParakeetBatteryLogFilter
                     
                 }
             }
-            //openFileDialog1.Dispose();
+            openFileDialog1.Dispose();
             return File;
         }
         //THIS FUNCTION HANDLE DATA EXPORT.
@@ -152,38 +158,45 @@ namespace ParakeetBatteryLogFilter
             }
             catch(System.IO.IOException)
             {
-                string message_failed = "Cannot write to destination file. File is in use.";
+                string message_failed = "Cannot write to destination file. File is in use." + Environment.NewLine + "Try again?";
                 string caption_failed = "IO Error";
-                MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
+                MessageBoxButtons buttons_fail = MessageBoxButtons.YesNo;
                 DialogResult result_fail;
                 // Displays the MessageBox.
-                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error);
-                if (result_fail == System.Windows.Forms.DialogResult.OK)
+                result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
+                if (result_fail == System.Windows.Forms.DialogResult.Yes)
                 {
-                    Main();
+                    Data_export(data, folderpath, filename);
                     return;
                 }
+                else
+                    return;
             }
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv")))
             {
                 //THIS LINE IS THE LABEL OF EACH COLUMNS IN THE CSV FILE. CHANGE OR REMOVE THEM AS YOU SEE FIT.
-                outputFile.WriteLine("Loop #, Date, Time, u16VacADCVal, u16VacADCFirstVal, sVacVoltage,VBUS(V), VBAT(V), VSYS(V), IBUS(mA), IBAT(mA), TS_JC(C), Discharging, Percentage, CHG_STAT,wSysTempADCValue,wSysTemperature,Heater Status,CHG_STATUS,JEITA,Charging Status (0x02),Reg(0x00),Reg(0x01),Reg(0x02),Reg(0x03),Reg(0x04),Reg(0x05),Reg(0x06),Reg(0x07),Reg(0x08),Reg(0x09),Reg(0x0a),Reg(0x0b),Reg(0x0c),Reg(0x0d),Reg(0x0e),Reg(0x0f),Reg(0x10),Reg(0x11),Reg(0x18),Reg(0x19),Reg(0x1a),Reg(0x40),Reg(0x42),Reg(0x43),Reg(0x44),Reg(0x45),Reg(0x50),Reg(0x51),Reg(0x52),Reg(0x53),Reg(0x54),Reg(0x55),Reg(0x60),Reg(0x61),Reg(0x62),Reg(0x63),Reg(0x64),Reg(0x65),FW Version,Wifi Version,Camera Version");
+                outputFile.WriteLine("Loop #, Date, Time, u16VacADCVal, u16VacADCFirstVal, sVacVoltage,VBUS(V), VBAT(V), VSYS(V), IBUS(mA), IBAT(mA), TS_JC(C), Discharging, Percentage (%), CHG_STAT,wSysTempADCValue,wSysTemperature,Heater Status,CHG_STATUS (0x42),JEITA (0x43),Charging Status (0x02),Reg(0x00),Reg(0x01),Reg(0x02),Reg(0x03),Reg(0x04),Reg(0x05),Reg(0x06),Reg(0x07),Reg(0x08),Reg(0x09),Reg(0x0a),Reg(0x0b),Reg(0x0c),Reg(0x0d),Reg(0x0e),Reg(0x0f),Reg(0x10),Reg(0x11),Reg(0x18),Reg(0x19),Reg(0x1a),Reg(0x40),Reg(0x42),Reg(0x43),Reg(0x44),Reg(0x45),Reg(0x50),Reg(0x51),Reg(0x52),Reg(0x53),Reg(0x54),Reg(0x55),Reg(0x60),Reg(0x61),Reg(0x62),Reg(0x63),Reg(0x64),Reg(0x65),FW Version,Wifi Version,Camera Version");
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
-            string message = "Data exported to " + folderpath +"\\" + filename.Remove(filename.Length - 4) + ".csv.";
+            string message = "Data exported to " + folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + Environment.NewLine + "Open exported file?";
             string caption = "Success!";
-            MessageBoxButtons buttons = MessageBoxButtons.OK;
+            MessageBoxButtons buttons = MessageBoxButtons.YesNo;
             DialogResult result;
+            //test
+            //Form1 newform = new Form1(caption,message, folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
+            //Application.Run(newform);
+            //test
 
             // Displays the MessageBox.
-            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information);
-            if (result == System.Windows.Forms.DialogResult.OK)
+            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+            if (result == System.Windows.Forms.DialogResult.Yes)
             {
+                System.Diagnostics.Process.Start(folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
                 return;
             }
-            //Console.WriteLine("Data exported to " + folderpath + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + "Press any key to continue...");
-            //Console.ReadKey(true);
+            else
+                return;
         }
     }
     //THIS CLASS STORE AND PARSE DATA FROM EACH LOOP INTO NUMERIC DATA.
@@ -217,18 +230,32 @@ namespace ParakeetBatteryLogFilter
             //This search and extract loop number from the second string (index 1, using zero-based counting) in each loop.
             //The string we are looking for is in this format: "LOOP #X".The X position in the string is 7 (count on zero-based position). 
             //Then we use this function to extract the data: looptext[Y].Substring(Z): Y is the line number count from zero. Z is the position of X count from zero.
-            loopnumber = looptext[1].Substring(7);
+            foreach (string line in looptext)
+            {
+                if (line.Contains("LOOP: #"))
+                {
+                    loopnumber =line.Substring(7);
+                    break;
+                }
+            }
         }
         public void DateTime_Parse()
         {
             //0 is the line number that contain date and time. Zero based.
             //The date-time string looks like this: [MM DD YYYY, HH:MM:SSPM/AM]
             //This line remove the bracket from the string.
-            date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
-            //this line search for the seperator between date and time
-            int datelocation = date_parsed.IndexOf(", ");
-            //this line remove the space between date and time.
-            date_parsed = date_parsed.Remove(datelocation + 1, 1);
+            if (looptext[0].Length > 3)
+            {
+                date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
+                if (!(looptext[0].Remove(looptext[0].Length - 3)).Substring(1).Contains(','))
+                    date_parsed = date_parsed + ", ";
+                //this line search for the seperator between date and time
+                int datelocation = date_parsed.IndexOf(", ");
+                //this line remove the space between date and time.
+                date_parsed = date_parsed.Remove(datelocation + 1, 1);
+            }
+            else
+                date_parsed = "Parse Error,Parse Error";
         }
         public void VACparse()
         {
@@ -243,7 +270,7 @@ namespace ParakeetBatteryLogFilter
                 //First we search for AAA using this line: line.Contains("AAA")
                 if (line.Contains("m_stADC.stVac.u16VacADCVal"))
                 {
-                    //Then we search for location of xxx: int datalocation = line.IndexOf("xxx") + length_of_xxx;
+                    //Then we search for location of xxx: "int datalocation = line.IndexOf("xxx") + length_of_xxx";
                     int datalocation = line.IndexOf("=> ") + 3;
                     //Finally we extract the data we want (aka YYY) and assign it to one of the variable we declared above.
                     VACDATA.Add(line.Substring(datalocation));
@@ -285,6 +312,9 @@ namespace ParakeetBatteryLogFilter
                 {
                     //the data we want will usually in the next line. Hence we use i+1.
                     string batterydata = looptext[i + 1];
+                    //replace junk data with space.
+                    batterydata = batterydata.Replace('/', ' ');
+                    batterydata = batterydata.Replace('#', ' ');
                     //Then we remove all white space and replace with a single space using NormalizeWhiteSpace funtion.
                     batterydata = NormalizeWhiteSpace(batterydata);
                     //spit the normalized string into an array of number.
