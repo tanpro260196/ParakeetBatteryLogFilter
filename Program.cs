@@ -12,7 +12,7 @@ namespace ParakeetBatteryLogFilter
 {
     class Program
     {
-        //[STAThread]
+        [STAThread]
         static void Main()
         {
             //CALL FILE SELECTION FUNCTION
@@ -94,20 +94,19 @@ namespace ParakeetBatteryLogFilter
         {
             bool pathcheck = false;
             System.Windows.Forms.OpenFileDialog openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            openFileDialog1.Multiselect = true;
-            openFileDialog1.InitialDirectory = @"C:\BatteryTest";
-            openFileDialog1.DefaultExt = "log";
-            openFileDialog1.Title = "Open Log File";
-            openFileDialog1.CheckFileExists = true;
-            openFileDialog1.CheckPathExists = true;
-            openFileDialog1.Filter = "Log Files(*.log)| *.log";
             List<FileInfo> File = new List<FileInfo>();
-            
             while (!pathcheck)
             {
-                bool? result = openFileDialog1.ShowDialog();
+                openFileDialog1.Multiselect = true;
+                openFileDialog1.InitialDirectory = @"C:\BatteryTest";
+                openFileDialog1.DefaultExt = "log";
+                openFileDialog1.Title = "Open Log File";
+                openFileDialog1.CheckFileExists = true;
+                openFileDialog1.CheckPathExists = true;
+                openFileDialog1.Filter = "Log Files(*.log)| *.log";
+                DialogResult result = openFileDialog1.ShowDialog();
                 //Console.WriteLine(openFileDialog1.FileName);
-                if (result == false)
+                if (result == DialogResult.Cancel)
                     break;
                 foreach (string filename in openFileDialog1.FileNames)
                 {
