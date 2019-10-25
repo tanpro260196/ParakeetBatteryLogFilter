@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Misc.cs" />
     <Compile Include="Loop.cs" />
     <Compile Include="LogFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

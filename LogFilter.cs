@@ -8,10 +8,11 @@ using Microsoft.Win32;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Globalization;
+using ParakeetBatteryLogFilter;
 
 namespace ParakeetBatteryLogFilter
 {
-    class LogFilter
+    partial class LogFilter
     {
         [STAThread]
         static void Main()
@@ -71,26 +72,9 @@ namespace ParakeetBatteryLogFilter
                 {
                     Loop temploopdata = new Loop();
                     int j = 0;
-                    bool datefound = false;
-                    //DateTime tryparse;
-                    for (int x = lastloop_end; x <= i; x++)
-                    {
-                        if (text[x].Contains('[') && text[x].Contains(']') & (text[x].Length <= 24) & !text[x].Contains("pega_i2c") & !text[x].Contains("wifi"))
-                        {
-                            temploopdata.looptext.Add(text[x]);
-                            datefound = true;
-                            break;
-                        }
-                        //                    if (DateTime.TryParseExact(text[x], "[MM dd yyyy, hh:mm:sstt]",
-                        //CultureInfo.InvariantCulture, DateTimeStyles.None, out tryparse))
-                        //                    {
-                        //                        temploopdata.looptext.Add(text[x]);
-                        //                        datefound = true;
-                        //                        break;
-                        //                    }
-                    }
-                    if (!datefound)
-                        temploopdata.looptext.Add("[Date not found, Time not found  ]");
+                    //Try to detect the line contain timestamp. The details for this function is in Misc.cs file.
+                    temploopdata.looptext.Add(Time_Stamp_Detection(lastloop_end, i, text));
+
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
                     for (j = i; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)

@@ -40,7 +40,8 @@ namespace ParakeetBatteryLogFilter
             {
                 if (line.Contains("LOOP: #"))
                 {
-                    loopnumber = line.Substring(7);
+                    int dataposition = line.IndexOf("LOOP: #");
+                    loopnumber = line.Substring(dataposition + 7);
                     break;
                 }
             }
@@ -48,7 +49,7 @@ namespace ParakeetBatteryLogFilter
         public void DateTime_Parse()
         {
             //0 is the line number that contain date and time. Zero based.
-            //The date-time string looks like this: [MM DD YYYY, HH:MM:SSPM/AM]
+            //The date-time string looks like this: [MM dd yyyy, hh:mm:ssPM/AM]
             //This line remove the bracket from the string.
             if (looptext[0].Length > 3)
             {
