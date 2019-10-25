@@ -54,7 +54,7 @@ namespace ParakeetBatteryLogFilter
             {
                 date_parsed = (looptext[0].Remove(looptext[0].Length - 3)).Substring(1);
                 if (!(looptext[0].Remove(looptext[0].Length - 3)).Substring(1).Contains(','))
-                    date_parsed = date_parsed + ", ";
+                    date_parsed += ", ";
                 //this line search for the seperator between date and time
                 int datelocation = date_parsed.IndexOf(", ");
                 //this line remove the space between date and time.

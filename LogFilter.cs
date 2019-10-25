@@ -7,6 +7,7 @@ using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Globalization;
 
 namespace ParakeetBatteryLogFilter
 {
@@ -61,6 +62,7 @@ namespace ParakeetBatteryLogFilter
             }
             string[] text = System.IO.File.ReadAllLines(@file);
             int i = 0;
+            int lastloop_end = 0;
             for (i = 0; i < text.Count(); i++)
             {
                 //FIND LOOP START IDENTIFIER FIRST
@@ -69,14 +71,29 @@ namespace ParakeetBatteryLogFilter
                 {
                     Loop temploopdata = new Loop();
                     int j = 0;
-                    int offset;
-                    //Checking if the loop number and date is in proper position.
-                    if (text[i - 1].Length == 0)
-                        offset = 2;
-                    else offset = 1;
+                    bool datefound = false;
+                    //DateTime tryparse;
+                    for (int x = lastloop_end; x <= i; x++)
+                    {
+                        if (text[x].Contains('[') && text[x].Contains(']') & (text[x].Length <= 24) & !text[x].Contains("pega_i2c") & !text[x].Contains("wifi"))
+                        {
+                            temploopdata.looptext.Add(text[x]);
+                            datefound = true;
+                            break;
+                        }
+                        //                    if (DateTime.TryParseExact(text[x], "[MM dd yyyy, hh:mm:sstt]",
+                        //CultureInfo.InvariantCulture, DateTimeStyles.None, out tryparse))
+                        //                    {
+                        //                        temploopdata.looptext.Add(text[x]);
+                        //                        datefound = true;
+                        //                        break;
+                        //                    }
+                    }
+                    if (!datefound)
+                        temploopdata.looptext.Add("[Date not found, Time not found  ]");
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
-                    for (j = i - offset; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
+                    for (j = i; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
                     { 
                         temploopdata.looptext.Add(text[j]);
                     }
@@ -84,6 +101,7 @@ namespace ParakeetBatteryLogFilter
                     {
                         loopdata.Add(temploopdata);
                         i = j;
+                        lastloop_end = i+2;
                     }
                 }
             }
