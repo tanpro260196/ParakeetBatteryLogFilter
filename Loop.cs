@@ -104,12 +104,13 @@ namespace ParakeetBatteryLogFilter
             //if for some reason the result is not recorded in that loop. We add this instead.
             if (resultfound == 0)
                 VACDATA.Add("No result found., ,");
+            while (VACDATA.Count() < 3)
+                VACDATA.Add("No result found.");
         }
         public void Batteryparse()
         {
             //Special case. The result is present in a table-like manner.
             //This type usually have 1 line contain the data label and the data is in the next line.
-            bool resultfound = false;
             battery_pegacmd = new List<string>();
             //int i = 0;
             for (int i = 0; i < looptext.Count(); i++)
@@ -124,27 +125,22 @@ namespace ParakeetBatteryLogFilter
                     batterydata = batterydata.Replace('#', ' ');
                     //Then we remove all white space and replace with a single space using NormalizeWhiteSpace funtion.
                     batterydata = NormalizeWhiteSpace(batterydata);
-                    //spit the normalized string into an array of number.
-                    List<string> parseddata = new List<string>();
-                    parseddata.AddRange(batterydata.Split(' '));
-                    //for (int x = 0; x < (parseddata.Count() - 1); x++)
-                    //{
-                    //    if (!double.TryParse(parseddata[x], out _))
-                    //        parseddata[x] = "Data not found";
-                    //}
-                    while (parseddata.Count() < 9)
+                    //spit the normalized string into an array of number and add those number to the variable we declared above.
+                    battery_pegacmd.AddRange(batterydata.Split(' '));
+                    for (int x = 0; x < (battery_pegacmd.Count() - 1); x++)
                     {
-                        parseddata.Add("Data not found");
+                        if (!double.TryParse(battery_pegacmd[x], out _))
+                            battery_pegacmd[x] = "Data not found";
                     }
-                    //add those number to the variable we declared above
-                    foreach (string temp in parseddata)
+                    if (battery_pegacmd[battery_pegacmd.Count() - 1].Length > 2)
+                        battery_pegacmd[battery_pegacmd.Count() - 1] = "Data not found";
+                    while (battery_pegacmd.Count() < 9)
                     {
-                        resultfound = true;
-                        battery_pegacmd.Add(temp);
+                        battery_pegacmd.Add("Data not found");
                     }
                 }
             }
-            if (!resultfound)
+            if (battery_pegacmd.Count() == 0)
                 battery_pegacmd.Add("No result found.,,,,,,,,");
             else if (battery_pegacmd.Count() > 9)
                 battery_pegacmd.RemoveAt(0);
