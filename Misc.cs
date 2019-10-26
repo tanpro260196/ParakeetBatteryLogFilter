@@ -22,7 +22,7 @@ namespace ParakeetBatteryLogFilter
                         //Detect '[' as starting character.
                         if (text[x].ElementAt(i) == '[')
                         {
-                            //Check every chacracter follow the starting character to make sure they follow proper format: [MM dd yyyy, hh:mm:sstt]
+                            //Check every chacracter from the starting character to make sure they follow this format: [MM dd yyyy, hh:mm:sstt]
                             if (!int.TryParse(text[x].ElementAt(i + 1).ToString(), out _) || !int.TryParse(text[x].ElementAt(i + 2).ToString(), out _))
                                 continue;
                             if (text[x].ElementAt(i + 3) != ' ')
@@ -49,15 +49,12 @@ namespace ParakeetBatteryLogFilter
                                 continue;
                             if (!int.TryParse(text[x].ElementAt(i + 19).ToString(), out _) || !int.TryParse(text[x].ElementAt(i + 20).ToString(), out _))
                                 continue;
-                            //If all conditions above is false, the line does contain the timestamp. Then we return the result and break the loops.
+                            //If all conditions above are false then the line does contain the timestamp. So we return the result and break the loops.
                             datefound = text[x].Substring(i, 24);
                             x = end + 1;
                             break;
                         }
                     }
-                    //temploopdata.looptext.Add(text[x]);
-                    //datefound = text[x];
-                    //return datefound;
                 }
             }
             if (datefound == null)

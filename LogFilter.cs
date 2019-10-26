@@ -72,7 +72,7 @@ namespace ParakeetBatteryLogFilter
                 {
                     Loop temploopdata = new Loop();
                     int j = 0;
-                    //Try to detect the line contain timestamp. The details for this function is in Misc.cs file.
+                    //Try to detect the line which contains the timestamp. The details for this function is in the Misc.cs file.
                     temploopdata.looptext.Add(Time_Stamp_Detection(lastloop_end, i, text));
 
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER

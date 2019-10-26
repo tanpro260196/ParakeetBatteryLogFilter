@@ -125,7 +125,17 @@ namespace ParakeetBatteryLogFilter
                     //Then we remove all white space and replace with a single space using NormalizeWhiteSpace funtion.
                     batterydata = NormalizeWhiteSpace(batterydata);
                     //spit the normalized string into an array of number.
-                    string[] parseddata = batterydata.Split(' ');
+                    List<string> parseddata = new List<string>();
+                    parseddata.AddRange(batterydata.Split(' '));
+                    //for (int x = 0; x < (parseddata.Count() - 1); x++)
+                    //{
+                    //    if (!double.TryParse(parseddata[x], out _))
+                    //        parseddata[x] = "Data not found";
+                    //}
+                    while (parseddata.Count() < 9)
+                    {
+                        parseddata.Add("Data not found");
+                    }
                     //add those number to the variable we declared above
                     foreach (string temp in parseddata)
                     {
@@ -136,7 +146,7 @@ namespace ParakeetBatteryLogFilter
             }
             if (!resultfound)
                 battery_pegacmd.Add("No result found.,,,,,,,,");
-            else
+            else if (battery_pegacmd.Count() > 9)
                 battery_pegacmd.RemoveAt(0);
         }
         public void TemperatureParse()
