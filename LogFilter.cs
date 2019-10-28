@@ -40,12 +40,15 @@ namespace ParakeetBatteryLogFilter
         {
             //THE LOG IS SPIT AND SAVED EACH LOOP TO THIS VARIABLE BELOW
             List<Loop> loopdata = new List<Loop>();
-            //READ THE CONTENT OF THE LOG FILE AND SAVE THEM TO A TEMP VARIABLE FOR PROCESSING.
-            try { FileStream checkread = System.IO.File.OpenRead(@file);
+            //Before processing, check if the file is readable and not in use by any other program.
+            try
+            {
+                FileStream checkread = System.IO.File.OpenRead(@file);
                 checkread.Close();
             }
             catch (System.IO.IOException)
             {
+                //If the file cannot be read. Show an error box.
                 string message_failed = "Cannot open input file(s). File(s) is in use.";
                 string caption_failed = "IO Error";
                 MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
@@ -56,11 +59,9 @@ namespace ParakeetBatteryLogFilter
                 {
                     return null;
                 }
-                //Console.WriteLine("Can't open file. Did you close Tera Term log yet?");
-                //Console.WriteLine("Press any key to continue...");
-                //Console.ReadKey(true);
-                //return null;
             }
+
+            //THEN READ THE CONTENT OF THE LOG FILE AND SAVE THEM TO A TEMP VARIABLE FOR PROCESSING.
             string[] text = System.IO.File.ReadAllLines(@file);
             int i = 0;
             int lastloop_end = 0;
@@ -107,7 +108,6 @@ namespace ParakeetBatteryLogFilter
                 openFileDialog1.CheckPathExists = true;
                 openFileDialog1.Filter = "Log Files(*.log)| *.log";
                 DialogResult result = openFileDialog1.ShowDialog();
-                //Console.WriteLine(openFileDialog1.FileName);
                 if (result == DialogResult.Cancel)
                     break;
                 foreach (string filename in openFileDialog1.FileNames)
@@ -151,7 +151,8 @@ namespace ParakeetBatteryLogFilter
             {
                 combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data.ToArray()));
             }
-            // Write the string array to a new file.
+            
+            //Before writing to file. Check if file is writable or not.
             try            
             {
                 FileStream checkwrite = System.IO.File.OpenWrite(@Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv"));
@@ -173,6 +174,8 @@ namespace ParakeetBatteryLogFilter
                 else
                     return;
             }
+
+            // Write the string array to a new file.
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv")))
             {
                 //THIS LINE IS THE LABEL OF EACH COLUMNS IN THE CSV FILE. CHANGE OR REMOVE THEM AS YOU SEE FIT.
@@ -180,16 +183,12 @@ namespace ParakeetBatteryLogFilter
                 foreach (string line in combinetocsv)
                     outputFile.WriteLine(line);
             }
+
+            //Show a success message box after export and offer to open the file on the spot.
             string message = "Data exported to " + folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + Environment.NewLine + "Open exported file?";
             string caption = "Success!";
             MessageBoxButtons buttons = MessageBoxButtons.YesNo;
             DialogResult result;
-            //test
-            //Form1 newform = new Form1(caption,message, folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
-            //Application.Run(newform);
-            //test
-
-            // Displays the MessageBox.
             result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {

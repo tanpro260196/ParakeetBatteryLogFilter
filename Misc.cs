@@ -13,7 +13,7 @@ namespace ParakeetBatteryLogFilter
             //Go line by line from the end of last loop to the "LOOP: #" line.
             for (int x = start; x <= end; x++)
             {
-                //Check each line for certain basic timestamp character. Such as '[', ']'
+                //Check each line for certain basic timestamp character. Such as '[' and ']'
                 if (text[x].Contains('[') && text[x].Contains(']') && !text[x].Contains("pega_i2c") && !text[x].Contains("wifi"))
                 {
                     //Go through that line character by character.
