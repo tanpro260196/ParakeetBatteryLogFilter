@@ -146,28 +146,31 @@ namespace ParakeetBatteryLogFilter
         public void TemperatureParse()
         {
             temperature = new List<string>();
-            int resultfound = 0;
             foreach (string line in looptext)
             {
                 if (line.Contains("m_stADC.wSysTempADCValue"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
                     temperature.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
                 if (line.Contains("m_stADC.wSysTemperature(C)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
                     temperature.Add(line.Substring(datalocation));
-                    resultfound++;
-                }
-                if (resultfound >= 2)
-                {
-                    break;
                 }
             }
-            if (resultfound == 0)
-                temperature.Add("No result found.,");
+            for (int i = 0; i < temperature.Count(); i++)
+            {
+                if (!int.TryParse(temperature[i], out _))
+                {
+                    if (temperature.Count() <= 2)
+                        registerdump[i] = "Data Error.";
+                    else
+                        registerdump.RemoveAt(i);
+                }
+            }
+            while (temperature.Count() < 2)
+                temperature.Add("No result found.");
         }
         public void HeaterParse()
         {
@@ -448,9 +451,9 @@ namespace ParakeetBatteryLogFilter
                 //if (registerdump.Count() >= 38)
                 //    break;
             }
-            for (int i =0; i<=registerdump.Count();i++)
+            for (int i = 0; i < registerdump.Count(); i++)
             {
-                if (!int.TryParse(registerdump[i].Substring(1), System.Globalization.NumberStyles.HexNumber, null, out _))
+                if (!int.TryParse(registerdump[i].Substring(2, 2).ToLower(), System.Globalization.NumberStyles.HexNumber, null, out _))
                 {
                     if (registerdump.Count() <= 38)
                         registerdump[i] = "Data Error.";
