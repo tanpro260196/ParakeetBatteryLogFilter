@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using Microsoft.VisualBasic;
-using Microsoft.Win32;
+using System.Linq;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Globalization;
-using ParakeetBatteryLogFilter;
 
 namespace ParakeetBatteryLogFilter
 {
@@ -18,7 +12,7 @@ namespace ParakeetBatteryLogFilter
         static void Main()
         {
             //CALL FILE SELECTION FUNCTION
-            List <FileInfo> fileselection = Get_filepath();
+            List<FileInfo> fileselection = Get_filepath();
             if (fileselection == null)
                 return;
             //Loop through all selected files.
@@ -63,8 +57,8 @@ namespace ParakeetBatteryLogFilter
 
             //THEN READ THE CONTENT OF THE LOG FILE AND SAVE THEM TO A TEMP VARIABLE FOR PROCESSING.
             string[] text = System.IO.File.ReadAllLines(@file);
-            int i = 0;
             int lastloop_end = 0;
+            int i;
             for (i = 0; i < text.Count(); i++)
             {
                 //FIND LOOP START IDENTIFIER FIRST
@@ -72,21 +66,21 @@ namespace ParakeetBatteryLogFilter
                 if ((text[i].Contains("LOOP: #")) && (!text[i].Contains("*")))
                 {
                     Loop temploopdata = new Loop();
-                    int j = 0;
                     //Try to detect the line which contains the timestamp. The details for this function is in the Misc.cs file.
                     temploopdata.looptext.Add(Time_Stamp_Detection(lastloop_end, i, text));
 
+                    int j;
                     //THEN GO THROUGH THE DATA LINE BY LINE (AND SAVE THOSE LINES TO THE LOOP ARRAY) UNTIL IT SEE THE END LOOP IDENTIFIER
                     //replace ***** with end loop IDENTIFIER
-                    for (j = i; (j < text.Count() && (!text[j].Contains("**********************************************************************")));j++)
-                    { 
+                    for (j = i; (j < text.Count() && (!text[j].Contains("**********************************************************************"))); j++)
+                    {
                         temploopdata.looptext.Add(text[j]);
                     }
                     if (temploopdata != null)
                     {
                         loopdata.Add(temploopdata);
                         i = j;
-                        lastloop_end = i+2;
+                        lastloop_end = i + 2;
                     }
                 }
             }
@@ -119,7 +113,7 @@ namespace ParakeetBatteryLogFilter
                         pathcheck = true;
                         File.Add(new FileInfo(filename));
                     }
-                    
+
                 }
             }
             openFileDialog1.Dispose();
@@ -151,14 +145,14 @@ namespace ParakeetBatteryLogFilter
             {
                 combinetocsv.Add(string.Join(",", showdata.all_processed_parsed_data.ToArray()));
             }
-            
+
             //Before writing to file. Check if file is writable or not.
-            try            
+            try
             {
                 FileStream checkwrite = System.IO.File.OpenWrite(@Path.Combine(folderpath, filename.Remove(filename.Length - 4) + ".csv"));
                 checkwrite.Close();
             }
-            catch(System.IO.IOException)
+            catch (System.IO.IOException)
             {
                 string message_failed = "Cannot write to destination file. File is in use." + Environment.NewLine + Environment.NewLine + "Try again?";
                 string caption_failed = "IO Error";

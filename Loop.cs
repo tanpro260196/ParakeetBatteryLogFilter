@@ -102,8 +102,6 @@ namespace ParakeetBatteryLogFilter
                 }
             }
             //if for some reason the result is not recorded in that loop. We add this instead.
-            if (resultfound == 0)
-                VACDATA.Add("No result found., ,");
             while (VACDATA.Count() < 3)
                 VACDATA.Add("No result found.");
         }
@@ -130,7 +128,7 @@ namespace ParakeetBatteryLogFilter
                     for (int x = 0; x < (battery_pegacmd.Count() - 1); x++)
                     {
                         if (!double.TryParse(battery_pegacmd[x], out _))
-                            battery_pegacmd[x] = "Data not found";
+                            battery_pegacmd.RemoveAt(x);
                     }
                     if (battery_pegacmd[battery_pegacmd.Count() - 1].Length > 2)
                         battery_pegacmd[battery_pegacmd.Count() - 1] = "Data not found";
@@ -203,7 +201,7 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("read:regAddr(0x0x42)"))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    CHG_STATUS42 = line.Substring(datalocation);
+                    CHG_STATUS42 = line.Substring(datalocation,4);
                     resultfound = true;
                 }
                 if (resultfound)
@@ -222,7 +220,7 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("read:regAddr(0x0x43)"))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    JEITA43 = line.Substring(datalocation);
+                    JEITA43 = line.Substring(datalocation,4);
                     resultfound = true;
                 }
                 if (resultfound)
@@ -241,7 +239,7 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("read:regAddr(0x0x2)"))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    Charging02 = line.Substring(datalocation);
+                    Charging02 = line.Substring(datalocation,4);
                     resultfound = true;
                 }
                 if (resultfound)
@@ -255,241 +253,212 @@ namespace ParakeetBatteryLogFilter
         public void Registerdump_parse()
         {
             registerdump = new List<string>();
-            int resultfound = 0;
             foreach (string line in looptext)
             {
                 if (line.Contains("Reg(0x00)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x01)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x02)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x03)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x04)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x05)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x06)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x07)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x08)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x09)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x0a)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x0b)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x0c)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x0d)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x0e)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x0f)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x10)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x11)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x18)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x19)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x1a)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x40)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x42)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x43)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x44)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x45)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x50)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x51)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x52)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x53)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x54)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x55)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x60)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x61)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x62)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x63)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x64)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
                 if (line.Contains("Reg(0x65)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation));
-                    resultfound++;
+                    registerdump.Add(line.Substring(datalocation,4));
                 }
-                if (resultfound >= 38)
-                    break;
+                //if (registerdump.Count() >= 38)
+                //    break;
             }
-            if (resultfound == 0)
+            for (int i =0; i<=registerdump.Count();i++)
+            {
+                if (!int.TryParse(registerdump[i].Substring(1), System.Globalization.NumberStyles.HexNumber, null, out _))
+                {
+                    if (registerdump.Count() <= 38)
+                        registerdump[i] = "Data Error.";
+                    else
+                        registerdump.RemoveAt(i);
+                }
+            }
+            while (registerdump.Count() < 38)
                 registerdump.Add("No result found.");
         }
         public void FW_Version_Parse()
@@ -528,9 +497,11 @@ namespace ParakeetBatteryLogFilter
         {
             //here you combine add variables you declared in the first part of this class into one long string.
             //If the variable is of List<> type, use AddRange(), if not, use Add().
-            all_processed_parsed_data = new List<string>();
-            all_processed_parsed_data.Add(loopnumber);
-            all_processed_parsed_data.Add(date_parsed);
+            all_processed_parsed_data = new List<string>
+            {
+                loopnumber,
+                date_parsed
+            };
             all_processed_parsed_data.AddRange(VACDATA);
             all_processed_parsed_data.AddRange(battery_pegacmd);
             all_processed_parsed_data.AddRange(temperature);
@@ -568,7 +539,6 @@ namespace ParakeetBatteryLogFilter
                     output.Append(c);
                 }
             }
-
             return output.ToString();
         }
     }
