@@ -69,7 +69,6 @@ namespace ParakeetBatteryLogFilter
             //AC voltage parse.
             //any variable in List<> type need to be initialize before use like this: example_var = new List<xxx>();
             VACDATA = new List<string>();
-            int resultfound = 0;
             foreach (string line in looptext)
             {
                 //This is the most common type of result. A string will contain some identifier before each value. Like this:
@@ -81,22 +80,19 @@ namespace ParakeetBatteryLogFilter
                     int datalocation = line.IndexOf("=> ") + 3;
                     //Finally we extract the data we want (aka YYY) and assign it to one of the variable we declared above.
                     VACDATA.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
                 //repeat as many times as you need to get all the data for each line.
                 if (line.Contains("m_stADC.stVac.u16VacADCFirstVal"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
                     VACDATA.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
                 if (line.Contains("m_stADC.stVac.sVacVoltage"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
                     VACDATA.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
-                if (resultfound >= 3)
+                if (VACDATA.Count() >= 3)
                 {
                     break;
                 }
@@ -204,7 +200,14 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("read:regAddr(0x0x42)"))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    CHG_STATUS42 = line.Substring(datalocation,4);
+                    try
+                    {
+                        CHG_STATUS42 = line.Substring(datalocation, 4);
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        CHG_STATUS42 = line.Substring(datalocation);
+                    }
                     resultfound = true;
                 }
                 if (resultfound)
@@ -223,7 +226,14 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("read:regAddr(0x0x43)"))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    JEITA43 = line.Substring(datalocation,4);
+                    try
+                    {
+                        JEITA43 = line.Substring(datalocation, 4);
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        JEITA43 = line.Substring(datalocation);
+                    }
                     resultfound = true;
                 }
                 if (resultfound)
@@ -242,7 +252,14 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("read:regAddr(0x0x2)"))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    Charging02 = line.Substring(datalocation,4);
+                    try
+                    {
+                        Charging02 = line.Substring(datalocation, 4);
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        Charging02 = line.Substring(datalocation);
+                    }
                     resultfound = true;
                 }
                 if (resultfound)
@@ -261,195 +278,459 @@ namespace ParakeetBatteryLogFilter
                 if (line.Contains("Reg(0x00)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x01)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x02)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x03)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x04)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x05)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x06)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x07)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x08)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x09)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x0a)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x0b)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x0c)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x0d)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x0e)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x0f)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x10)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x11)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x18)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x19)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x1a)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x40)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x42)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x43)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x44)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x45)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x50)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x51)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x52)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x53)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x54)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x55)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x60)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x61)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x62)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x63)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x64)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
                 if (line.Contains("Reg(0x65)"))
                 {
                     int datalocation = line.IndexOf("=> ") + 3;
-                    registerdump.Add(line.Substring(datalocation,4));
+                    try
+                    {
+                        registerdump.Add(line.Substring(datalocation, 4));
+                    }
+                    catch (System.ArgumentOutOfRangeException)
+                    {
+                        registerdump.Add(line.Substring(datalocation));
+                    }
                 }
-                //if (registerdump.Count() >= 38)
-                //    break;
             }
             for (int i = 0; i < registerdump.Count(); i++)
             {
@@ -467,33 +748,29 @@ namespace ParakeetBatteryLogFilter
         public void FW_Version_Parse()
         {
             FWVersion = new List<string>();
-            int resultfound = 0;
             foreach (string line in looptext)
             {
                 if (line.Contains("	version = "))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
                     FWVersion.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
                 if (line.Contains("wifi version = "))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
                     FWVersion.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
                 if (line.Contains("camif --version:"))
                 {
                     int datalocation = line.IndexOf(":") + 1;
                     FWVersion.Add(line.Substring(datalocation));
-                    resultfound++;
                 }
-                if (resultfound >= 3)
+                if (FWVersion.Count() >= 3)
                 {
                     break;
                 }
             }
-            if (resultfound == 0)
+            if (FWVersion.Count() == 0)
                 FWVersion.Add("No result found.,,");
         }
         public void Combinedata()

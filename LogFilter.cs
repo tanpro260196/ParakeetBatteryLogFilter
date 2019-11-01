@@ -22,8 +22,7 @@ namespace ParakeetBatteryLogFilter
                 List<Loop> maintext_processed = Readtext(file.FullName);
                 if (maintext_processed == null)
                 {
-                    Main();
-                    return;
+                    continue;
                 }
                 //PARSE AND EXPORT TO CSV
                 Data_export(maintext_processed, file.DirectoryName, file.Name);
@@ -33,6 +32,7 @@ namespace ParakeetBatteryLogFilter
         static List<Loop> Readtext(string file)
         {
             //THE LOG IS SPIT AND SAVED EACH LOOP TO THIS VARIABLE BELOW
+            FileInfo inputfile = new FileInfo(file);
             List<Loop> loopdata = new List<Loop>();
             //Before processing, check if the file is readable and not in use by any other program.
             try
@@ -43,13 +43,18 @@ namespace ParakeetBatteryLogFilter
             catch (System.IO.IOException)
             {
                 //If the file cannot be read. Show an error box.
-                string message_failed = "Cannot open input file(s). File(s) is in use.";
+                string message_failed = "Cannot open " + inputfile.Name + Environment.NewLine + ". File is in use." + Environment.NewLine + Environment.NewLine + "Try again?";
                 string caption_failed = "IO Error";
-                MessageBoxButtons buttons_fail = MessageBoxButtons.OK;
+                MessageBoxButtons buttons_fail = MessageBoxButtons.YesNo;
                 DialogResult result_fail;
                 // Displays the MessageBox.
                 result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                if (result_fail == System.Windows.Forms.DialogResult.OK)
+                if (result_fail == System.Windows.Forms.DialogResult.Yes)
+                {
+                    return Readtext(file);
+                    
+                }
+                if (result_fail == System.Windows.Forms.DialogResult.No)
                 {
                     return null;
                 }
