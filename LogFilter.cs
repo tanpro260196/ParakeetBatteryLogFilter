@@ -10,7 +10,7 @@ namespace ParakeetBatteryLogFilter
     {
         [STAThread]
         static void Main()
-        {
+        {            
             //CALL FILE SELECTION FUNCTION
             List<FileInfo> fileselection = Get_filepath();
             if (fileselection == null)
@@ -45,18 +45,28 @@ namespace ParakeetBatteryLogFilter
                 //If the file cannot be read. Show an error box.
                 string message_failed = "Cannot open " + inputfile.Name + Environment.NewLine + ". File is in use." + Environment.NewLine + Environment.NewLine + "Try again?";
                 string caption_failed = "IO Error";
-                MessageBoxButtons buttons_fail = MessageBoxButtons.YesNo;
+                MessageBoxButtons buttons_fail = MessageBoxButtons.AbortRetryIgnore;
                 DialogResult result_fail;
                 // Displays the MessageBox.
                 result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                if (result_fail == System.Windows.Forms.DialogResult.Yes)
+                switch (result_fail)
                 {
-                    return Readtext(file);
-                    
-                }
-                if (result_fail == System.Windows.Forms.DialogResult.No)
-                {
-                    return null;
+                    case System.Windows.Forms.DialogResult.Retry:
+                        return Readtext(file);
+                    case System.Windows.Forms.DialogResult.Ignore:
+                        return null;
+                    case System.Windows.Forms.DialogResult.Abort:
+                        if (System.Windows.Forms.Application.MessageLoop)
+                        {
+                            // WinForms app
+                            System.Windows.Forms.Application.Exit();
+                        }
+                        else
+                        {
+                            // Console app
+                            System.Environment.Exit(1);
+                        }
+                        break;
                 }
             }
 
@@ -161,17 +171,30 @@ namespace ParakeetBatteryLogFilter
             {
                 string message_failed = "Cannot write to destination file. File is in use." + Environment.NewLine + Environment.NewLine + "Try again?";
                 string caption_failed = "IO Error";
-                MessageBoxButtons buttons_fail = MessageBoxButtons.YesNo;
+                MessageBoxButtons buttons_fail = MessageBoxButtons.AbortRetryIgnore;
                 DialogResult result_fail;
-                // Displays the MessageBox.
+                 // Displays the MessageBox.
                 result_fail = MessageBox.Show(message_failed, caption_failed, buttons_fail, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
-                if (result_fail == System.Windows.Forms.DialogResult.Yes)
+                switch (result_fail)
                 {
-                    Data_export(data, folderpath, filename);
-                    return;
+                    case System.Windows.Forms.DialogResult.Retry:
+                        Data_export(data, folderpath, filename);
+                        return;
+                    case System.Windows.Forms.DialogResult.Ignore:
+                        return;
+                    case System.Windows.Forms.DialogResult.Abort:
+                        if (System.Windows.Forms.Application.MessageLoop)
+                        {
+                            // WinForms app
+                            System.Windows.Forms.Application.Exit();
+                        }
+                        else
+                        {
+                            // Console app
+                            System.Environment.Exit(1);
+                        }
+                        break;
                 }
-                else
-                    return;
             }
 
             // Write the string array to a new file.
