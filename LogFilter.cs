@@ -209,16 +209,25 @@ namespace ParakeetBatteryLogFilter
             //Show a success message box after export and offer to open the file on the spot.
             string message = "Data exported to " + folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv." + Environment.NewLine + Environment.NewLine + "Open exported file?";
             string caption = "Success!";
-            MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+            //MessageBoxManager.Yes = "Open";
+            //MessageBoxManager.No = "Close";
+            //MessageBoxManager.Register();
+            //DialogResult result;
+            //result = MessageBox.Show(message, caption, MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2);
             DialogResult result;
-            result = MessageBox.Show(message, caption, buttons, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly);
+            Form1 newform = new Form1();
+            result = newform.Show(folderpath, filename);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
                 System.Diagnostics.Process.Start(folderpath + "\\" + filename.Remove(filename.Length - 4) + ".csv.");
+                MessageBoxManager.Unregister();
                 return;
             }
             else
+            {
+                MessageBoxManager.Unregister();
                 return;
+            }
         }
     }
 }
