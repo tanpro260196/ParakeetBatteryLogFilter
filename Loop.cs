@@ -109,7 +109,7 @@ namespace ParakeetBatteryLogFilter
             //int i = 0;
             for (int i = 0; i < looptext.Count(); i++)
             {
-                //search for the lable line by literally search for the entire line.
+                //search for the lable line by literally trying to match the entire line.
                 if (looptext[i].Contains("VBUS(V) VBAT(V) VSYS(V) IBUS(mA) IBAT(mA) TS_JC(C) Discharging Percentage CHG_STAT"))
                 {
                     //the data we want will usually in the next line. Hence we use i+1.
@@ -121,6 +121,8 @@ namespace ParakeetBatteryLogFilter
                     batterydata = NormalizeWhiteSpace(batterydata);
                     //spit the normalized string into an array of number and add those number to the variable we declared above.
                     battery_pegacmd.AddRange(batterydata.Split(' '));
+
+                    //Verify the number of data points and type. We should get 8 data points of type integer, one of string (hex). If the result does not fit, remove all wrong entries.
                     for (int x = 0; x < (battery_pegacmd.Count() - 1); x++)
                     {
                         if (!double.TryParse(battery_pegacmd[x], out _))
@@ -155,6 +157,7 @@ namespace ParakeetBatteryLogFilter
                     temperature.Add(line.Substring(datalocation));
                 }
             }
+            //Verify the number of data points and type. We should get 3 data points of type integer. If the result does not fit, remove all wrong entries.
             for (int i = 0; i < temperature.Count(); i++)
             {
                 if (!int.TryParse(temperature[i], out _))
@@ -170,7 +173,7 @@ namespace ParakeetBatteryLogFilter
         }
         public void HeaterParse()
         {
-            //This is a tricky part. The result only contain a single integer, no indentifier whatsoever.
+            //This could be a tricky part. The result only contain a single integer, no indentifier whatsoever.
             bool resultfound = false;
             foreach (string line in looptext)
             {
@@ -775,8 +778,8 @@ namespace ParakeetBatteryLogFilter
         }
         public void Combinedata()
         {
-            //here you combine add variables you declared in the first part of this class into one long string.
-            //If the variable is of List<> type, use AddRange(), if not, use Add().
+            //here you combine/add variables you declared in the first part of this class into one long string.
+            //If the variable is a List<>, use AddRange(), if not, use Add().
             all_processed_parsed_data = new List<string>
             {
                 loopnumber,
