@@ -163,9 +163,9 @@ namespace ParakeetBatteryLogFilter
                 if (!int.TryParse(temperature[i], out _))
                 {
                     if (temperature.Count() <= 2)
-                        registerdump[i] = "Data Error.";
+                        temperature[i] = "Data Error.";
                     else
-                        registerdump.RemoveAt(i);
+                        temperature.RemoveAt(i);
                 }
             }
             while (temperature.Count() < 2)
