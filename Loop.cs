@@ -134,6 +134,7 @@ namespace ParakeetBatteryLogFilter
                     {
                         battery_pegacmd.Add("Data not found");
                     }
+                    break;
                 }
             }
             if (battery_pegacmd.Count() == 0)
