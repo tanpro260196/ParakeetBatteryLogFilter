@@ -113,7 +113,11 @@ namespace ParakeetBatteryLogFilter
                 if (looptext[i].Contains("VBUS(V) VBAT(V) VSYS(V) IBUS(mA) IBAT(mA) TS_JC(C) Discharging Percentage CHG_STAT"))
                 {
                     //the data we want will usually in the next line. Hence we use i+1.
-                    string batterydata = looptext[i + 1];
+                    string batterydata = "";
+                    if (i + 1 < looptext.Count())
+                    {
+                        batterydata = looptext[i + 1];
+                    }
                     //replace junk data with space.
                     batterydata = batterydata.Replace('/', ' ');
                     batterydata = batterydata.Replace('#', ' ');
