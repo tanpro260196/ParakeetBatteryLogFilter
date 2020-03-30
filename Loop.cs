@@ -99,7 +99,7 @@ namespace ParakeetBatteryLogFilter
             }
             //if for some reason the result is not recorded in that loop. We add this instead.
             while (VACDATA.Count() < 3)
-                VACDATA.Add("No result found.");
+                VACDATA.Add("");
         }
         public void Batteryparse()
         {
@@ -110,7 +110,7 @@ namespace ParakeetBatteryLogFilter
             for (int i = 0; i < looptext.Count(); i++)
             {
                 //search for the lable line by literally trying to match the entire line.
-                if (looptext[i].Contains("VBUS(V) VBAT(V) VSYS(V) IBUS(mA) IBAT(mA) TS_JC(C) Discharging Percentage CHG_STAT"))
+                if (looptext[i].Contains("VBUS(V) VBAT(V) VSYS(V) IBUS(mA) IBAT(mA) TS_JC(C) Discharging"))
                 {
                     //the data we want will usually in the next line. Hence we use i+1.
                     string batterydata = "";
@@ -136,7 +136,7 @@ namespace ParakeetBatteryLogFilter
                         battery_pegacmd[battery_pegacmd.Count() - 1] = "Data not found";
                     while (battery_pegacmd.Count() < 9)
                     {
-                        battery_pegacmd.Add("Data not found");
+                        battery_pegacmd.Add("");
                     }
                     break;
                 }
@@ -792,13 +792,6 @@ namespace ParakeetBatteryLogFilter
             };
             all_processed_parsed_data.AddRange(VACDATA);
             all_processed_parsed_data.AddRange(battery_pegacmd);
-            all_processed_parsed_data.AddRange(temperature);
-            all_processed_parsed_data.Add(heaterstatus);
-            all_processed_parsed_data.Add(CHG_STATUS42);
-            all_processed_parsed_data.Add(JEITA43);
-            all_processed_parsed_data.Add(Charging02);
-            all_processed_parsed_data.AddRange(registerdump);
-            all_processed_parsed_data.AddRange(FWVersion);
         }
         //This function remove all white spaces that are like this "     " and replace that with " "
         private static string NormalizeWhiteSpace(string input, char normalizeTo = ' ')
