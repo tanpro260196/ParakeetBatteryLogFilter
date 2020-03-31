@@ -132,7 +132,7 @@ namespace ParakeetBatteryLogFilter
                         if (!double.TryParse(battery_pegacmd[x], out _))
                             battery_pegacmd.RemoveAt(x);
                     }
-                    if (battery_pegacmd[battery_pegacmd.Count() - 4].Length > 2)
+                    if ((battery_pegacmd.Count() > 3) && (battery_pegacmd[battery_pegacmd.Count() - 4].Length > 2))
                         battery_pegacmd[battery_pegacmd.Count() - 4] = "";
                     if ((battery_pegacmd.Count() > 9) && !double.TryParse(battery_pegacmd[battery_pegacmd.Count() - 1],out _))
                         battery_pegacmd[battery_pegacmd.Count() - 1] = "";
@@ -145,7 +145,7 @@ namespace ParakeetBatteryLogFilter
             }
             if (battery_pegacmd.Count() == 0)
                 battery_pegacmd.Add(",,,,,,,,");
-            else if (battery_pegacmd.Count() > 11)
+            else if (battery_pegacmd.Count() > 12)
                 battery_pegacmd.RemoveAt(0);
         }
         public void TemperatureParse()
