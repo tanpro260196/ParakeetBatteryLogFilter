@@ -126,14 +126,14 @@ namespace ParakeetBatteryLogFilter
                     //spit the normalized string into an array of number and add those number to the variable we declared above.
                     battery_pegacmd.AddRange(batterydata.Split(' '));
 
-                    //Verify the number of data points and type. We should get 8 data points of type integer, one of string (hex). If the result does not fit, remove all wrong entries.
-                    for (int x = 0; x < (battery_pegacmd.Count() - 1); x++)
+                    //Verify the number of data points and type. We should get 11 data points of type integer, one of string (hex). If the result does not fit, remove all wrong entries.
+                    for (int x = 0; x < (battery_pegacmd.Count() - 4); x++)
                     {
                         if (!double.TryParse(battery_pegacmd[x], out _))
                             battery_pegacmd.RemoveAt(x);
                     }
-                    if (battery_pegacmd[battery_pegacmd.Count() - 1].Length > 2)
-                        battery_pegacmd[battery_pegacmd.Count() - 1] = "Data not found";
+                    if ((battery_pegacmd.Count() > 3) && (battery_pegacmd[battery_pegacmd.Count() - 1].Length > 2))
+                        battery_pegacmd[battery_pegacmd.Count() - 1] = "";
                     while (battery_pegacmd.Count() < 9)
                     {
                         battery_pegacmd.Add("");
@@ -142,9 +142,10 @@ namespace ParakeetBatteryLogFilter
                 }
             }
             if (battery_pegacmd.Count() == 0)
-                battery_pegacmd.Add("No result found.,,,,,,,,");
+                battery_pegacmd.Add(",,,,,,,,");
             else if (battery_pegacmd.Count() > 9)
                 battery_pegacmd.RemoveAt(0);
+            //battery_pegacmd.RemoveAt(battery_pegacmd.Count() - 1);
         }
         public void TemperatureParse()
         {
@@ -752,34 +753,38 @@ namespace ParakeetBatteryLogFilter
             }
             while (registerdump.Count() < 38)
                 registerdump.Add("No result found.");
+            while (registerdump.Count() > 38)
+                registerdump.RemoveAt(registerdump.Count() - 1);
         }
         public void FW_Version_Parse()
         {
             FWVersion = new List<string>();
+            string version = null;
+            string wifi = null;
+            string camif = null;
             foreach (string line in looptext)
             {
                 if (line.Contains("	version = "))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    FWVersion.Add(line.Substring(datalocation));
+                    version = line.Substring(datalocation);
                 }
                 if (line.Contains("wifi version = "))
                 {
                     int datalocation = line.IndexOf("= ") + 2;
-                    FWVersion.Add(line.Substring(datalocation));
+                    wifi = line.Substring(datalocation);
                 }
                 if (line.Contains("camif --version:"))
                 {
                     int datalocation = line.IndexOf(":") + 1;
-                    FWVersion.Add(line.Substring(datalocation));
+                    camif = line.Substring(datalocation);
                 }
-                if (FWVersion.Count() >= 3)
-                {
+                if (version != null && wifi != null && camif != null)
                     break;
-                }
             }
-            if (FWVersion.Count() == 0)
-                FWVersion.Add("No result found.,,");
+            FWVersion.Add(version);
+            FWVersion.Add(wifi);
+            FWVersion.Add(camif);
         }
         public void Combinedata()
         {
@@ -792,6 +797,13 @@ namespace ParakeetBatteryLogFilter
             };
             all_processed_parsed_data.AddRange(VACDATA);
             all_processed_parsed_data.AddRange(battery_pegacmd);
+            all_processed_parsed_data.AddRange(temperature);
+            all_processed_parsed_data.Add(heaterstatus);
+            all_processed_parsed_data.Add(CHG_STATUS42);
+            all_processed_parsed_data.Add(JEITA43);
+            all_processed_parsed_data.Add(Charging02);
+            all_processed_parsed_data.AddRange(registerdump);
+            all_processed_parsed_data.AddRange(FWVersion);
         }
         //This function remove all white spaces that are like this "     " and replace that with " "
         private static string NormalizeWhiteSpace(string input, char normalizeTo = ' ')
